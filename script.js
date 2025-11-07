@@ -17,39 +17,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const basePath = getBasePath();
 
     // Cargar Header
-    fetch(`${basePath}partials/header.html`)
-        .then(res => {
-            if (!res.ok) throw new Error(`Error: ${res.status}`);
-            return res.text();
-        })
-        .then(data => {
-            const headerPlaceholder = document.getElementById("header-placeholder");
-            if (headerPlaceholder) {
-                headerPlaceholder.innerHTML = data;
-                setTimeout(() => {
-                    initializeHeader();
-                }, 100);
-            }
-        })
-        .catch(err => {
-            console.error("Error cargando header:", err);
-        });
+    // Cargar Header
+fetch('partials/header.html')
+    .then(res => {
+        if (!res.ok) throw new Error(`Error: ${res.status}`);
+        return res.text();
+    })
+    .then(data => {
+        const headerPlaceholder = document.getElementById("header-placeholder");
+        if (headerPlaceholder) {
+            headerPlaceholder.innerHTML = data;
+            setTimeout(() => {
+                initializeHeader();
+            }, 100);
+        }
+    })
+    .catch(err => {
+        console.error("Error cargando header:", err);
+    });
+
         
     // Cargar Footer
-    fetch(`${basePath}partials/footer.html`)
-        .then(res => {
-            if (!res.ok) throw new Error(`Error: ${res.status}`);
-            return res.text();
-        })
-        .then(data => {
-            const footerPlaceholder = document.getElementById("footer-placeholder");
-            if (footerPlaceholder) {
-                footerPlaceholder.innerHTML = data;
-            }
-        })
-        .catch(err => {
-            console.error("Error cargando footer:", err);
-        });
+    fetch('partials/footer.html')
+    .then(res => {
+        if (!res.ok) throw new Error(`Error: ${res.status}`);
+        return res.text();
+    })
+    .then(data => {
+        const footerPlaceholder = document.getElementById("footer-placeholder");
+        if (footerPlaceholder) {
+            footerPlaceholder.innerHTML = data;
+        }
+    })
+    .catch(err => {
+        console.error("Error cargando footer:", err);
+    });
 
     // Inicializar todas las funcionalidades
     initializeAllFeatures();
