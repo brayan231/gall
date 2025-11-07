@@ -1,5 +1,5 @@
 /// ===== CONFIGURACIÓN PARA GITHUB PAGES =====
-const GITHUB_REPO_NAME = 'tu-repositorio'; // ⚠️ CAMBIAR por el nombre real de tu repositorio
+const GITHUB_REPO_NAME = 'gall';
 const isGitHubPages = window.location.hostname.includes('github.io');
 const basePath = isGitHubPages ? `/${GITHUB_REPO_NAME}` : '';
 
@@ -1512,3 +1512,4 @@ window.initializeAllFeatures = initializeAllFeatures;
 window.initAboutPage = initAboutPage;
 window.initMissionVisionPage = initMissionVisionPage;
 window.getCorrectPath = getCorrectPath;
+
