@@ -1,61 +1,131 @@
-/// Detectar si estamos en GitHub Pages
-const GITHUB_REPO_NAME = 'tu-repositorio'; // Cambia esto
+/// ===== CONFIGURACIÓN PARA GITHUB PAGES =====
+const GITHUB_REPO_NAME = 'tu-repositorio'; // ⚠️ CAMBIAR por el nombre real de tu repositorio
 const isGitHubPages = window.location.hostname.includes('github.io');
-const repoPath = isGitHubPages ? `/${GITHUB_REPO_NAME}` : '';
-// ===== Cargar Header y Footer =====
+const basePath = isGitHubPages ? `/${GITHUB_REPO_NAME}` : '';
+
+console.log('Configuración:', { isGitHubPages, basePath, hostname: window.location.hostname });
+
+// ===== FUNCIÓN PARA OBTENER RUTA CORRECTA =====
+function getCorrectPath(path) {
+    // Si estamos en GitHub Pages y la ruta no empieza con el basePath
+    if (isGitHubPages && !path.startsWith(basePath)) {
+        // Si la ruta empieza con '/', agregar basePath
+        if (path.startsWith('/')) {
+            return basePath + path;
+        }
+        // Si la ruta es relativa, agregar basePath
+        return basePath + '/' + path;
+    }
+    return path;
+}
+
+// ===== CARGAR HEADER Y FOOTER =====
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM cargado, iniciando aplicación...");
     
-    // Determinar ruta base
-    const getBasePath = () => {
-        const path = window.location.pathname;
-        if (path.includes('/pages/') || path.includes('/conocenos/') || path.includes('/programas/')) {
-            return '../';
-        }
-        return './';
-    };
-    const basePath = getBasePath();
+    // Determinar si estamos en una subcarpeta
+    const currentPath = window.location.pathname;
+    const isInSubfolder = currentPath.includes('/pages/') || 
+                         currentPath.includes('/conocenos/') || 
+                         currentPath.includes('/programas/');
+    
+    // Construir ruta relativa para partials
+    let partialsPath = isInSubfolder ? '../partials/' : 'partials/';
+    
+    // Si estamos en GitHub Pages, usar ruta absoluta
+    if (isGitHubPages) {
+        partialsPath = getCorrectPath('/partials/');
+    }
+    
+    console.log('Ruta de partials:', partialsPath);
 
     // Cargar Header
-    // Cargar Header
-fetch('partials/header.html')
-    .then(res => {
-        if (!res.ok) throw new Error(`Error: ${res.status}`);
-        return res.text();
-    })
-    .then(data => {
-        const headerPlaceholder = document.getElementById("header-placeholder");
-        if (headerPlaceholder) {
-            headerPlaceholder.innerHTML = data;
-            setTimeout(() => {
-                initializeHeader();
-            }, 100);
-        }
-    })
-    .catch(err => {
-        console.error("Error cargando header:", err);
-    });
-
+    fetch(partialsPath + 'header.html')
+        .then(res => {
+            if (!res.ok) throw new Error(`Error: ${res.status}`);
+            return res.text();
+        })
+        .then(data => {
+            const headerPlaceholder = document.getElementById("header-placeholder");
+            if (headerPlaceholder) {
+                headerPlaceholder.innerHTML = data;
+                setTimeout(() => {
+                    initializeHeader();
+                    fixNavigationLinks(); // Corregir enlaces después de cargar
+                }, 100);
+            }
+        })
+        .catch(err => {
+            console.error("Error cargando header:", err);
+            console.error("Intentó cargar desde:", partialsPath + 'header.html');
+        });
         
     // Cargar Footer
-    fetch('partials/footer.html')
-    .then(res => {
-        if (!res.ok) throw new Error(`Error: ${res.status}`);
-        return res.text();
-    })
-    .then(data => {
-        const footerPlaceholder = document.getElementById("footer-placeholder");
-        if (footerPlaceholder) {
-            footerPlaceholder.innerHTML = data;
-        }
-    })
-    .catch(err => {
-        console.error("Error cargando footer:", err);
-    });
+    fetch(partialsPath + 'footer.html')
+        .then(res => {
+            if (!res.ok) throw new Error(`Error: ${res.status}`);
+            return res.text();
+        })
+        .then(data => {
+            const footerPlaceholder = document.getElementById("footer-placeholder");
+            if (footerPlaceholder) {
+                footerPlaceholder.innerHTML = data;
+                fixNavigationLinks(); // Corregir enlaces después de cargar
+            }
+        })
+        .catch(err => {
+            console.error("Error cargando footer:", err);
+            console.error("Intentó cargar desde:", partialsPath + 'footer.html');
+        });
 
     // Inicializar todas las funcionalidades
     initializeAllFeatures();
 });
+
+// ===== CORREGIR ENLACES DE NAVEGACIÓN PARA GITHUB PAGES =====
+function fixNavigationLinks() {
+    if (!isGitHubPages) return;
+    
+    // Corregir todos los enlaces internos
+    const internalLinks = document.querySelectorAll('a[href^="/"], a[href^="./"], a[href^="../"]');
+    
+    internalLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        
+        // No modificar enlaces externos o anclas
+        if (href.startsWith('http') || href.startsWith('#')) return;
+        
+        // Si el enlace no tiene el basePath, agregarlo
+        if (!href.includes(basePath)) {
+            let newHref = href;
+            
+            // Remover ./ o ../ del inicio
+            newHref = newHref.replace(/^\.\.?\//g, '');
+            
+            // Agregar basePath
+            newHref = basePath + '/' + newHref;
+            
+            // Limpiar barras duplicadas
+            newHref = newHref.replace(/\/+/g, '/');
+            
+            link.setAttribute('href', newHref);
+            console.log('Enlace corregido:', href, '→', newHref);
+        }
+    });
+    
+    // Corregir imágenes
+    const images = document.querySelectorAll('img[src^="/"], img[src^="./"], img[src^="../"]');
+    images.forEach(img => {
+        const src = img.getAttribute('src');
+        if (!src.startsWith('http') && !src.includes(basePath)) {
+            let newSrc = src.replace(/^\.\.?\//g, '');
+            newSrc = basePath + '/' + newSrc;
+            newSrc = newSrc.replace(/\/+/g, '/');
+            img.setAttribute('src', newSrc);
+            console.log('Imagen corregida:', src, '→', newSrc);
+        }
+    });
+}
 
 // ===== INICIALIZAR TODAS LAS FUNCIONALIDADES =====
 function initializeAllFeatures() {
@@ -77,10 +147,12 @@ function initializeAllFeatures() {
     const inicioLink = document.getElementById("inicio-link");
     if (inicioLink) {
         inicioLink.addEventListener("click", function (e) {
-            const isOnIndex =
-                window.location.pathname.endsWith("index.html") ||
-                window.location.pathname === "/" ||
-                window.location.pathname.endsWith("/");
+            const currentPath = window.location.pathname;
+            const repoPath = isGitHubPages ? `/${GITHUB_REPO_NAME}` : '';
+            const isOnIndex = currentPath === repoPath + '/' || 
+                            currentPath === repoPath + '/index.html' ||
+                            currentPath === '/' ||
+                            currentPath === '/index.html';
 
             if (isOnIndex) {
                 e.preventDefault();
@@ -116,7 +188,6 @@ function initializeHeader() {
             navMenu.classList.toggle('active');
             overlay.classList.toggle('active');
             
-            // SIMPLIFICADO: Solo controlar overflow
             document.body.style.overflow = isActive ? 'auto' : 'hidden';
             
             const icon = mobileToggle.querySelector('i');
@@ -127,13 +198,11 @@ function initializeHeader() {
             console.log("Menú " + (isActive ? "cerrado" : "abierto"));
         };
 
-        // Evento del botón hamburguesa
         mobileToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleMenu();
         });
 
-        // Cerrar menú al hacer clic en overlay
         if (overlay) {
             overlay.addEventListener('click', () => {
                 if (navMenu.classList.contains('active')) {
@@ -142,7 +211,6 @@ function initializeHeader() {
             });
         }
 
-        // Cerrar menú al hacer clic en enlaces principales
         const navLinks = document.querySelectorAll('.nav-link:not(.dropdown .nav-link)');
         navLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -152,7 +220,6 @@ function initializeHeader() {
             });
         });
 
-        // Cerrar menú al hacer clic en enlaces del dropdown
         const dropdownLinks = document.querySelectorAll('.dropdown-menu a');
         dropdownLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -162,7 +229,6 @@ function initializeHeader() {
             });
         });
 
-        // Cerrar menú al redimensionar a desktop
         let resizeTimer;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
@@ -228,7 +294,6 @@ function initDropdowns() {
         
         if (!link || !menu) return;
         
-        // DESKTOP - Hover
         item.addEventListener('mouseenter', () => {
             if (window.innerWidth > 768) {
                 menu.classList.add('active');
@@ -241,13 +306,11 @@ function initDropdowns() {
             }
         });
         
-        // MOBILE - Click
         link.addEventListener('click', (e) => {
             if (window.innerWidth <= 768) {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Cerrar otros dropdowns
                 dropdownItems.forEach(otherItem => {
                     if (otherItem !== item) {
                         const otherMenu = otherItem.querySelector('.dropdown-menu');
@@ -263,7 +326,6 @@ function initDropdowns() {
         });
     });
     
-    // Cerrar dropdowns al hacer clic fuera
     document.addEventListener('click', (e) => {
         if (window.innerWidth > 768 && !e.target.closest('.nav-item.dropdown')) {
             dropdownItems.forEach(item => {
@@ -1449,3 +1511,4 @@ window.addEventListener('error', function(e) {
 window.initializeAllFeatures = initializeAllFeatures;
 window.initAboutPage = initAboutPage;
 window.initMissionVisionPage = initMissionVisionPage;
+window.getCorrectPath = getCorrectPath;
