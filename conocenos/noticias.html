@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias - Instituto Pedagógico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/conocenos.css">
+    <style>
+        /* Estilos específicos para la página de noticias */
+        .news-hero {
+            padding: 140px 0 80px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.08) 0%, rgba(58, 12, 163, 0.08) 100%);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .news-hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .news-hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .news-hero-description {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .news-search {
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .news-search input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid rgba(67, 97, 238, 0.2);
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .news-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.1);
+        }
+
+        .news-search button {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--gradient);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .news-search button:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Filtros de categorías */
+        .news-filters {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid rgba(67, 97, 238, 0.2);
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Grid de noticias */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(67, 97, 238, 0.15);
+        }
+
+        .news-image {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .news-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .news-card:hover .news-image img {
+            transform: scale(1.1);
+        }
+
+        .news-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gradient);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .news-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-date {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .news-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            line-height: 1.4;
+            color: var(--dark);
+        }
+
+        .news-excerpt {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .news-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .author-name {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .read-more {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            gap: 10px;
+        }
+
+        /* Noticia destacada */
+        .featured-news {
+            margin-bottom: 60px;
+        }
+
+        .featured-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            transition: all 0.3s ease;
+        }
+
+        .featured-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(67, 97, 238, 0.15);
+        }
+
+        .featured-image {
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .featured-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .featured-card:hover .featured-image img {
+            transform: scale(1.05);
+        }
+
+        .featured-content {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .featured-badge {
+            display: inline-block;
+            background: var(--gradient);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .featured-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            line-height: 1.3;
+            color: var(--dark);
+        }
+
+        .featured-excerpt {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* Paginación */
+        .news-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .page-btn {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(67, 97, 238, 0.2);
+            border-radius: 10px;
+            background: white;
+            color: #555;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn.active,
+        .page-btn:hover {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+        }
+
+        .page-btn.prev,
+        .page-btn.next {
+            width: auto;
+            padding: 0 20px;
+        }
+
+        /* Newsletter */
+        .newsletter-section {
+            padding: 80px 0;
+            background: var(--light);
+            text-align: center;
+        }
+
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .newsletter-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .newsletter-description {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .newsletter-form {
+            display: flex;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .newsletter-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid rgba(67, 97, 238, 0.2);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .newsletter-form button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .featured-card {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-image {
+                height: 300px;
+            }
+            
+            .news-hero-title {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .news-hero {
+                padding: 120px 0 60px;
+            }
+            
+            .news-hero-title {
+                font-size: 2.3rem;
+            }
+            
+            .news-hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .featured-title {
+                font-size: 1.7rem;
+            }
+            
+            .featured-content {
+                padding: 30px 25px;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+            
+            .newsletter-form button {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .news-hero-title {
+                font-size: 2rem;
+            }
+            
+            .news-filters {
+                gap: 10px;
+            }
+            
+            .filter-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .featured-title {
+                font-size: 1.5rem;
+            }
+            
+            .newsletter-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="news-hero about-hero">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+        </div>
+        <div class="container news-hero-content">
+            <h1 class="news-hero-title">
+                Noticias y <span>Actualidad</span>
+            </h1>
+            <p class="news-hero-description">
+                Mantente informado sobre los últimos acontecimientos, logros y novedades de nuestro instituto y la comunidad educativa.
+            </p>
+            
+            <div class="news-search">
+                <input type="text" placeholder="Buscar noticias...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filtros de Categorías -->
+    <section class="news-filters-section">
+        <div class="container">
+            <div class="news-filters">
+                <button class="filter-btn active" data-filter="all">Todas</button>
+                <button class="filter-btn" data-filter="academico">Académico</button>
+                <button class="filter-btn" data-filter="eventos">Eventos</button>
+                <button class="filter-btn" data-filter="investigacion">Investigación</button>
+                <button class="filter-btn" data-filter="estudiantes">Estudiantes</button>
+                <button class="filter-btn" data-filter="docentes">Docentes</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Noticia Destacada -->
+    <section class="featured-news">
+        <div class="container">
+            <div class="featured-card">
+                <div class="featured-image">
+                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Congreso Internacional de Educación">
+                </div>
+                <div class="featured-content">
+                    <span class="featured-badge">Destacado</span>
+                    <h2 class="featured-title">Nuestro Instituto participa en el Congreso Internacional de Educación Innovadora 2024</h2>
+                    <p class="featured-excerpt">
+                        Representantes de nuestra institución presentaron investigaciones pioneras sobre metodologías activas en el prestigioso congreso realizado en Madrid, España.
+                    </p>
+                    <div class="news-meta">
+                        <div class="news-author">
+                            <div class="author-avatar">
+                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Dr. Carlos Méndez">
+                            </div>
+                            <span class="author-name">Dr. Carlos Méndez</span>
+                        </div>
+                        <a href="#" class="read-more">
+                            Leer más <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Grid de Noticias -->
+    <section class="news-grid-section">
+        <div class="container">
+            <div class="news-grid">
+                <!-- Noticia 1 -->
+                <div class="news-card" data-category="academico">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1588072432836-e10032774350?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1172&q=80" alt="Nueva Maestría en Educación">
+                        <span class="news-category">Académico</span>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i> 15 Marzo, 2024
+                        </div>
+                        <h3 class="news-title">Lanzamos nueva Maestría en Educación con Enfoque en Tecnologías Emergentes</h3>
+                        <p class="news-excerpt">
+                            Programa innovador que combina pedagogía tradicional con las últimas herramientas tecnológicas para la educación del futuro.
+                        </p>
+                        <div class="news-meta">
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Dra. Elena Ruiz">
+                                </div>
+                                <span class="author-name">Dra. Elena Ruiz</span>
+                            </div>
+                            <a href="#" class="read-more">
+                                Leer más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noticia 2 -->
+                <div class="news-card" data-category="eventos">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Feria Vocacional">
+                        <span class="news-category">Eventos</span>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i> 10 Marzo, 2024
+                        </div>
+                        <h3 class="news-title">Gran éxito en nuestra Feria Vocacional 2024 con más de 2,000 asistentes</h3>
+                        <p class="news-excerpt">
+                            Estudiantes de secundaria conocieron nuestras carreras y participaron en talleres interactivos sobre la profesión docente.
+                        </p>
+                        <div class="news-meta">
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Lic. Roberto Silva">
+                                </div>
+                                <span class="author-name">Lic. Roberto Silva</span>
+                            </div>
+                            <a href="#" class="read-more">
+                                Leer más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noticia 3 -->
+                <div class="news-card" data-category="investigacion">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1554475900-0e0358524dff?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1174&q=80" alt="Investigación Educativa">
+                        <span class="news-category">Investigación</span>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i> 5 Marzo, 2024
+                        </div>
+                        <h3 class="news-title">Estudio revela impacto positivo de nuestras metodologías en el rendimiento estudiantil</h3>
+                        <p class="news-excerpt">
+                            Investigación longitudinal demuestra mejoras significativas en el aprendizaje con la aplicación de nuestras estrategias pedagógicas.
+                        </p>
+                        <div class="news-meta">
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1171&q=80" alt="Dra. Ana Morales">
+                                </div>
+                                <span class="author-name">Dra. Ana Morales</span>
+                            </div>
+                            <a href="#" class="read-more">
+                                Leer más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noticia 4 -->
+                <div class="news-card" data-category="estudiantes">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Estudiantes Destacados">
+                        <span class="news-category">Estudiantes</span>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i> 28 Febrero, 2024
+                        </div>
+                        <h3 class="news-title">Estudiantes ganan primer lugar en Olimpiada Nacional de Pedagogía</h3>
+                        <p class="news-excerpt">
+                            Nuestro equipo demostró excelencia en resolución de casos pedagógicos complejos, superando a 50 instituciones.
+                        </p>
+                        <div class="news-meta">
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Prof. Miguel Ángel">
+                                </div>
+                                <span class="author-name">Prof. Miguel Ángel</span>
+                            </div>
+                            <a href="#" class="read-more">
+                                Leer más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noticia 5 -->
+                <div class="news-card" data-category="docentes">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Capacitación Docente">
+                        <span class="news-category">Docentes</span>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i> 20 Febrero, 2024
+                        </div>
+                        <h3 class="news-title">Docentes participan en programa de actualización en inteligencia artificial educativa</h3>
+                        <p class="news-excerpt">
+                            Especialización de 120 horas para integrar herramientas de IA en el proceso de enseñanza-aprendizaje.
+                        </p>
+                        <div class="news-meta">
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Mtro. Javier López">
+                                </div>
+                                <span class="author-name">Mtro. Javier López</span>
+                            </div>
+                            <a href="#" class="read-more">
+                                Leer más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Noticia 6 -->
+                <div class="news-card" data-category="academico">
+                    <div class="news-image">
+                        <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1176&q=80" alt="Laboratorios Renovados">
+                        <span class="news-category">Académico</span>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-date">
+                            <i class="far fa-calendar"></i> 15 Febrero, 2024
+                        </div>
+                        <h3 class="news-title">Inauguramos nuevos laboratorios de simulación pedagógica con tecnología de punta</h3>
+                        <p class="news-excerpt">
+                            Espacios equipados con realidad virtual y sistemas de grabación para perfeccionar las habilidades docentes.
+                        </p>
+                        <div class="news-meta">
+                            <div class="news-author">
+                                <div class="author-avatar">
+                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" alt="Ing. Sofía Ramírez">
+                                </div>
+                                <span class="author-name">Ing. Sofía Ramírez</span>
+                            </div>
+                            <a href="#" class="read-more">
+                                Leer más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <div class="news-pagination">
+                <button class="page-btn prev"><i class="fas fa-chevron-left"></i> Anterior</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn next">Siguiente <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2 class="newsletter-title">Mantente Informado</h2>
+                <p class="newsletter-description">
+                    Suscríbete a nuestro boletín y recibe las últimas noticias, eventos y actualizaciones directamente en tu correo electrónico.
+                </p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Tu correo electrónico" required>
+                    <button type="submit">Suscribirse</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" id="scrollToTop">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script src="../script.js"></script>
+    <script>
+        // Funcionalidades específicas para la página de noticias
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filtrado de noticias por categoría
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const newsCards = document.querySelectorAll('.news-card');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remover clase active de todos los botones
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Agregar clase active al botón clickeado
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    
+                    newsCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Búsqueda de noticias
+            const searchInput = document.querySelector('.news-search input');
+            const searchButton = document.querySelector('.news-search button');
+            
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                newsCards.forEach(card => {
+                    const title = card.querySelector('.news-title').textContent.toLowerCase();
+                    const excerpt = card.querySelector('.news-excerpt').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || excerpt.includes(searchTerm)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+            
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            // Animación de entrada para las tarjetas
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            newsCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
