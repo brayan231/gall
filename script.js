@@ -1,5 +1,7 @@
-// ===== SCRIPT.JS COMPLETO Y UNIFICADO =====
-
+/// Detectar si estamos en GitHub Pages
+const GITHUB_REPO_NAME = 'tu-repositorio'; // Cambia esto
+const isGitHubPages = window.location.hostname.includes('github.io');
+const repoPath = isGitHubPages ? `/${GITHUB_REPO_NAME}` : '';
 // ===== Cargar Header y Footer =====
 document.addEventListener("DOMContentLoaded", () => {
     console.log("DOM cargado, iniciando aplicación...");
